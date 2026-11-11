@@ -1,0 +1,49 @@
+-- LocalScript inside the button
+
+local button = script.Parent
+
+-- The name to search for
+local TARGET_NAME = "name of remote"
+
+-- Recursively search an instance and its descendants for RemoteEvents with the target name
+local function findAllRemoteEvents(root, name)
+	local found = {}
+	for _, descendant in ipairs(root:GetDescendants()) do
+		if descendant:IsA("RemoteEvent") and descendant.Name == name then
+			table.insert(found, descendant)
+		end
+	end
+	return found
+end
+
+-- Fire the remote(s) when the button is clicked
+button.MouseButton1Click:Connect(function()
+	-- Search Workspace first
+	local remotes = findAllRemoteEvents(workspace, TARGET_NAME)
+
+	-- Search everywhere else (game root, which includes ReplicatedStorage,
+	-- ServerScriptService replicas, Players, etc.)
+	local gameRemotes = findAllRemoteEvents(game, TARGET_NAME)
+
+	-- Merge results, avoiding duplicates
+	local seen = {}
+	for _, r in ipairs(remotes) do
+		seen[r] = true
+	end
+	for _, r in ipairs(gameRemotes) do
+		if not seen[r] then
+			table.insert(remotes, r)
+			seen[r] = true
+		end
+	end
+
+	-- Fire all of them
+	for _, remote in ipairs(remotes) do
+		print("Firing:", remote:GetFullName())
+		remote:FireServer()
+	end
+
+	if #remotes == 0 then
+		warn("No RemoteEvents named '" .. TARGET_NAME .. "' found!")
+	end
+end)
