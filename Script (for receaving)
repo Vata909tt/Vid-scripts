@@ -1,4 +1,4 @@
-local remoteEvent = script:WaitForChild("Remote6")
+local remoteEvent = script:WaitForChild("name of remote")
 remoteEvent.OnServerEvent:Connect(function(player, ...)
   -- put what you want to execute --
 end)
