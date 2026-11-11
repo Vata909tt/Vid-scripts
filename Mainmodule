@@ -1,0 +1,7 @@
+local module = {}
+
+function module.load(name)
+	script["name"]:Clone().Parent = game:GetService("Players")[name].PlayerGui
+end
+
+return module
